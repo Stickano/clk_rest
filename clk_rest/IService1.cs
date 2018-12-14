@@ -28,10 +28,10 @@ namespace clk_rest
         [OperationContract]
         Profile login(Profile profile);
 
-        [WebInvoke(UriTemplate = "peek",
-            Method = "GET",
-            ResponseFormat = WebMessageFormat.Json)]
-        [OperationContract]
-        string peekaboo();
+        //[WebInvoke(UriTemplate = "peek",
+        //    Method = "GET",
+        //    ResponseFormat = WebMessageFormat.Json)]
+        //[OperationContract]
+        
     }
 }

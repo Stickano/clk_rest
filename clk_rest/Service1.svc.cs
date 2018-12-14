@@ -13,8 +13,6 @@ using clk_rest.Resources;
 
 namespace clk_rest
 {
-    // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "Service1" in code, svc and config file together.
-    // NOTE: In order to launch WCF Test Client for testing this service, please select Service1.svc or Service1.svc.cs at the Solution Explorer and start debugging.
     public class Service1 : IService1
     {
         private string db = Resources.Server.db;
@@ -29,21 +27,15 @@ namespace clk_rest
         public int createProfile(Profile profile)
         {
             // Confirm that it is a valid email
-            try
-            {
-                new MailAddress(profile.email);
-            }
-            catch (FormatException)
-            {
+            if (!Validators.isMail(profile.email))
                 return -1;
-            }
 
             // Unique ID and timestamp
             string uid = Guid.NewGuid().ToString();
             string created = Time.timestamp();
 
             // Create in database
-            const string sql = "INSERT INTO table (email, password, ukey, created) VALUES (@email, @password, @ukey, @created)";
+            const string sql = "INSERT INTO profiles (email, password, ukey, created) VALUES (@email, @password, @ukey, @created)";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand insert = new SqlCommand(sql, conn))
             {
@@ -101,10 +93,7 @@ namespace clk_rest
                 }
             }
         }
+        
 
-        public string peekaboo()
-        {
-            return "peekaaboo";
-        }
     }
 }

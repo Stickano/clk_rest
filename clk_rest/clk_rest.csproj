@@ -68,6 +68,7 @@
     <Compile Include="Models\Profile.cs" />
     <Compile Include="Resources\Server.cs" />
     <Compile Include="Resources\Time.cs" />
+    <Compile Include="Resources\Validators.cs" />
     <Compile Include="Service1.svc.cs">
       <DependentUpon>Service1.svc</DependentUpon>
     </Compile>
