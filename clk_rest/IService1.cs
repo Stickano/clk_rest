@@ -28,10 +28,18 @@ namespace clk_rest
         [OperationContract]
         Profile login(Profile profile);
 
+        [WebInvoke(UriTemplate = "board/save",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int saveBoard(Board board);
+
         //[WebInvoke(UriTemplate = "peek",
         //    Method = "GET",
         //    ResponseFormat = WebMessageFormat.Json)]
         //[OperationContract]
-        
+
     }
 }
