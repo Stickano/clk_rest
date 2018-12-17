@@ -109,27 +109,13 @@ namespace clk_rest
         /// <returns>1 on success, -1 if it wasn't satisfied with its parameters</returns>
         public int saveBoard(Board board)
         {
-            if (board.userId == null || board.password == null)
-                return -1;
+            // Check the user
+            Profile profile = new Profile();
+            profile.id = board.userId;
+            profile.password = board.password;
 
-            // Confirm user
-            string sql = "SELECT id FROM profiles WHERE ukey=@userId AND password=@password";
-            using (SqlConnection conn = new SqlConnection(db))
-            using (SqlCommand query = new SqlCommand(sql, conn))
-            {
-                query.Parameters.AddWithValue("@userId", board.userId);
-                query.Parameters.AddWithValue("@password", board.password);
-                conn.Open();
-                using (SqlDataReader result = query.ExecuteReader())
-                {
-                    // If user was NOT found, return an empty token
-                    if (!result.HasRows)
-                    {
-                        conn.Close();
-                        return -1;
-                    }
-                }
-            }
+            if (!isUser(profile))
+                return -1;
 
             // Make sure we aren't getting empty board values
             if (board.name.Equals("") || board.created.Equals("") || board.id.Equals(""))
@@ -141,21 +127,6 @@ namespace clk_rest
             createChecklist(board.checklists);
             createChecklistPoints(board.points);
             createComments(board.comments);
-            // Create the board
-            
-
-            // Create lists
-
-            // Create cards
-            
-            // Create checklists
-            
-
-            // Create checklist points (..doh  description = name)
-            
-
-            // Create comments
-            
 
             return 1;
         }
@@ -245,8 +216,29 @@ namespace clk_rest
             return board;
         }
 
+        /// <summary>
+        /// Deletes a profiles from the database.
+        /// It will first make sure, the id/password match
+        /// (make sure it is owner of profile, so not just everyone can delete profiles),
+        /// then delete it from the database.
+        /// It requires id and password of the profile.
+        /// </summary>
+        /// <param name="profile">The profile to delete</param>
+        /// <returns>1 on success, -1 on fail</returns>
         public int removeProfile(Profile profile)
         {
+            if (!isUser(profile))
+                return -1;
+
+            string sql = "DELETE FROM profiles WHERE ukey=@ukey";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                query.Parameters.AddWithValue("@ukey", profile.id);
+                conn.Open();
+                query.ExecuteNonQuery();
+                conn.Close();
+            }
 
             return 1;
         }
@@ -256,6 +248,39 @@ namespace clk_rest
         //TODO: Should I move all this below to a CRUD? I believe I should, yes. 
         #region Private GET List of elements
 
+
+        /// <summary>
+        /// This will match a Profile against a user in the database.
+        /// Will match against user id and password
+        /// </summary>
+        /// <param name="profile"></param>
+        /// <returns></returns>
+        private bool isUser(Profile profile)
+        {
+            if (profile.id == null || profile.password == null)
+                return false;
+
+            // Confirm user
+            string sql = "SELECT id FROM profiles WHERE ukey=@userId AND password=@password";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                query.Parameters.AddWithValue("@userId", profile.id);
+                query.Parameters.AddWithValue("@password", profile.password);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
+                {
+                    // If user was NOT found, return an empty token
+                    if (!result.HasRows)
+                    {
+                        conn.Close();
+                        return false;
+                    }
+
+                    return true;
+                }
+            }
+        }
 
         /// <summary>
         /// Receive the data of a specific board in the database.
