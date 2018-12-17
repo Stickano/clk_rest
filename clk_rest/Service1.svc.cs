@@ -86,7 +86,7 @@ namespace clk_rest
                     p.email = result["email"].ToString();
                     p.id = result["ukey"].ToString();
                     p.username = result["username"].ToString();
-                    
+
                     conn.Close();
                     return p;
                 }
@@ -189,7 +189,7 @@ namespace clk_rest
                     query.Parameters.AddWithValue("@name", ck.name);
                     query.Parameters.AddWithValue("@created", ck.created);
                     query.Parameters.AddWithValue("@card_id", ck.cardId);
-                    
+
                     conn.Open();
                     query.ExecuteNonQuery();
                     conn.Close();
@@ -293,14 +293,51 @@ namespace clk_rest
         /// <returns>(BoardController) Board with all its content</returns>
         public Board getBoard(Profile user, string boardId)
         {
-            Board b = new Board();
+            Board board = new Board();
 
             // Confirm user
             Profile p = login(user);
             if (p.id == null)
-                return b;
+                return board;
 
-            // Get board
+            board = getBoard(boardId);
+            IList<List> lists = getLists(boardId);
+            IList<Card> cards = new List<Card>();
+            IList<Checklist> checks = new List<Checklist>();
+            IList<ChecklistPoint> points = new List<ChecklistPoint>();
+            IList<Comment> comments = new List<Comment>();
+
+            // Add cards
+            foreach (List list in lists)
+            {
+                ((List<Card>) cards).AddRange(getCards(list.id));
+            }
+
+            // Add checklists & comments
+            foreach (Card card in cards)
+            {
+                ((List<Checklist>)checks).AddRange(getChecklists(card.id));
+                ((List<Comment>)comments).AddRange(getComments(card.id));
+            }
+
+            // Add checklist points
+            foreach (Checklist check in checks)
+            {
+                ((List<ChecklistPoint>)points).AddRange(getPoints(check.id));
+            }
+
+            return board;
+        }
+
+        /// <summary>
+        /// Receive the data of a specific board in the database.
+        /// </summary>
+        /// <param name="boardId">The ID of the board to receive</param>
+        /// <returns>A Board object with all its content (lists, cards, checklists etc)</returns>
+        private Board getBoard(string boardId)
+        {
+            Board board = new Board();
+
             string sql = "SELECT * FROM boards WHERE ukey=@boardId AND active=1";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
@@ -311,19 +348,29 @@ namespace clk_rest
                 {
                     // If user was NOT found, return an empty token
                     if (!result.HasRows)
-                        return b;
+                        return board;
 
                     result.Read();
-                    b.created = result["created"].ToString();
-                    b.name = result["name"].ToString();
-                    b.id = result["ukey"].ToString();
+                    board.created = result["created"].ToString();
+                    board.name = result["name"].ToString();
+                    board.id = result["ukey"].ToString();
 
                     conn.Close();
+                    return board;
                 }
             }
+        }
 
-            // Get lists
-            sql = "SELECT * FROM lists WHERE board_id=@boardId AND active=1";
+        /// <summary>
+        /// Receive all lists associated to board
+        /// </summary>
+        /// <param name="boardId">The ID of the board to receive lists for</param>
+        /// <returns>A List of List</returns>
+        private IList<List> getLists(string boardId)
+        {
+            IList<List> lists = new List<List>();
+
+            string sql = "SELECT * FROM lists WHERE board_id=@boardId AND active=1";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
@@ -333,139 +380,162 @@ namespace clk_rest
                 {
                     while (result.Read())
                     {
-                        b.lists.Add(new List
-                        {
-                            boardId = result["board_id"].ToString(),
-                            id = result["ukey"].ToString(),
-                            name = result["name"].ToString(),
-                            created = result["created"].ToString()
-                        });
+                        List list = new List();
+                        list.boardId = result["board_id"].ToString();
+                        list.id = result["ukey"].ToString();
+                        list.name = result["name"].ToString();
+                        list.created = result["created"].ToString();
+                        lists.Add(list);
                     }
-                    
+
                     conn.Close();
+                    return lists;
                 }
             }
+        }
 
-            // Get cards
-            sql = "SELECT * FROM cards WHERE list_id=@listId AND active=1";
+        /// <summary>
+        /// Receive all the cards associated to a list
+        /// </summary>
+        /// <param name="listId">The ID of the list to receive for</param>
+        /// <returns>A List of Card</returns>
+        private IList<Card> getCards(string listId)
+        {
+            IList<Card> cards = new List<Card>();
+
+            string sql = "SELECT * FROM cards WHERE list_id=@listId AND active=1";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
-                foreach (List list in b.lists)
+                query.Parameters.AddWithValue("@listId", listId);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
                 {
-                    query.Parameters.Clear();
-                    query.Parameters.AddWithValue("@listId", list.id);
-                    conn.Open();
-                    using (SqlDataReader result = query.ExecuteReader())
+                    while (result.Read())
                     {
-                        while (result.Read())
-                        {
-                            b.cards.Add(new Card
-                            {
-                                listId = result["list_id"].ToString(),
-                                id = result["ukey"].ToString(),
-                                name = result["description"].ToString(),
-                                created = result["created"].ToString()
-                            });
-                        }
-
-                        conn.Close();
+                        Card card = new Card();
+                        card.listId = result["list_id"].ToString();
+                        card.id = result["ukey"].ToString();
+                        card.name = result["description"].ToString();
+                        card.created = result["created"].ToString();
+                        cards.Add(card);
                     }
-                }
-                
-            }
 
-            // Get checklists
-            sql = "SELECT * FROM checklists WHERE card_id=@cardId AND active=1";
+                    conn.Close();
+                    return cards;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Receive all the checklists associated to a card
+        /// </summary>
+        /// <param name="cardId">The ID of the card to receive for</param>
+        /// <returns>A List of Checklist</returns>
+        private IList<Checklist> getChecklists(string cardId)
+        {
+            IList<Checklist> checks = new List<Checklist>();
+
+            string sql = "SELECT * FROM checklists WHERE card_id=@cardId AND active=1";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
-                foreach (Card card in b.cards)
+                query.Parameters.Clear();
+                query.Parameters.AddWithValue("@cardId", cardId);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
                 {
-                    query.Parameters.Clear();
-                    query.Parameters.AddWithValue("@cardId", card.id);
-                    conn.Open();
-                    using (SqlDataReader result = query.ExecuteReader())
+                    while (result.Read())
                     {
-                        while (result.Read())
-                        {
-                            b.checklists.Add(new Checklist
-                            {
-                                cardId = result["card_id"].ToString(),
-                                id = result["ukey"].ToString(),
-                                name = result["name"].ToString(),
-                                created = result["created"].ToString()
-                            });
-                        }
+                        Checklist check = new Checklist();
+                        check.cardId = result["card_id"].ToString();
+                        check.id = result["ukey"].ToString();
+                        check.name = result["name"].ToString();
+                        check.created = result["created"].ToString();
 
-                        conn.Close();
+                        checks.Add(check);
                     }
+                   
+                    conn.Close();
+                    return checks;
                 }
-
             }
+        }
 
-            // Get checklist points
-            sql = "SELECT * FROM checklist_points WHERE checklist_id=@checkId AND active=1";
+        /// <summary>
+        /// Receive all the checklist points associated with a checklist
+        /// </summary>
+        /// <param name="checklistId">The ID of the checklist to receive for</param>
+        /// <returns>A List of ChecklistPoint</returns>
+        private IList<ChecklistPoint> getPoints(string checklistId)
+        {
+            IList<ChecklistPoint> points = new List<ChecklistPoint>();
+
+            string sql = "SELECT * FROM checklist_points WHERE checklist_id=@checkId AND active=1";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
-                foreach (Checklist check in b.checklists)
+                query.Parameters.AddWithValue("@checkId", checklistId);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
                 {
-                    query.Parameters.Clear();
-                    query.Parameters.AddWithValue("@checkId", check.id);
-                    conn.Open();
-                    using (SqlDataReader result = query.ExecuteReader())
+                    while (result.Read())
                     {
-                        while (result.Read())
-                        {
-                            bool isCheck = result["checked"].ToString().Equals("1");
+                        ChecklistPoint point = new ChecklistPoint();
+                        bool isCheck = result["checked"].ToString().Equals("1");
+                        point.checklistId = result["checklist_id"].ToString();
+                        point.id = result["ukey"].ToString();
+                        point.name = result["description"].ToString();
+                        point.created = result["created"].ToString();
+                        point.isCheck = isCheck;
 
-                            b.points.Add(new ChecklistPoint
-                            {
-                                checklistId = result["checklist_id"].ToString(),
-                                id = result["ukey"].ToString(),
-                                name = result["description"].ToString(),
-                                created = result["created"].ToString(),
-                                isCheck = isCheck
-                            });
-                        }
-
-                        conn.Close();
+                        points.Add(point);
                     }
+
+                    conn.Close();
+                    return points;
                 }
-
             }
+        }
 
-            // Get comments
-            sql = "SELECT * FROM comments WHERE card_id=@cardId AND active=1";
+        /// <summary>
+        /// Receive all the comments associated to a card
+        /// </summary>
+        /// <param name="cardId">The ID of the card to receive for</param>
+        /// <returns>A List of Comment</returns>
+        private IList<Comment> getComments(string cardId)
+        {
+            IList<Comment> comments = new List<Comment>();
+
+            string sql = "SELECT * FROM comments WHERE card_id=@cardId AND active=1";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
-                foreach (Card card in b.cards)
+                query.Parameters.AddWithValue("@cardId", cardId);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
                 {
-                    query.Parameters.Clear();
-                    query.Parameters.AddWithValue("@cardId", card.id);
-                    conn.Open();
-                    using (SqlDataReader result = query.ExecuteReader())
+                    while (result.Read())
                     {
-                        while (result.Read())
-                        {
-                            b.comments.Add(new Comment
-                            {
-                                cardId = result["card_id"].ToString(),
-                                id = result["ukey"].ToString(),
-                                comment = result["comment"].ToString(),
-                                created = result["created"].ToString(),
-                                userId = result["user_id"].ToString()
-                            });
-                        }
+                        Comment comment = new Comment();
+                        comment.cardId = result["card_id"].ToString();
+                        comment.id = result["ukey"].ToString();
+                        comment.comment = result["comment"].ToString();
+                        comment.created = result["created"].ToString();
+                        comment.userId = result["user_id"].ToString();
 
-                        conn.Close();
+                        comments.Add(comment);
                     }
-                }
 
-                return b;
+                    conn.Close();
+                    return comments;
+                }
             }
+        }
+
+        public int removeProfile(Profile profile)
+        {
+            return 1;
         }
     }
 }
