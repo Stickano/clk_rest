@@ -243,11 +243,89 @@ namespace clk_rest
             return 1;
         }
 
+        /// <summary>
+        /// Public method to receive all members of a board (with user data).
+        /// </summary>
+        /// <param name="profile"></param>
+        /// <param name="boardId"></param>
+        /// <returns></returns>
+        public IList<BoardMember> getBoardMembers(Profile profile, string boardId)
+        {
+            IList<BoardMember> members = new List<BoardMember>();
+
+            if (!isUser(profile))
+                return members;
+
+            return getMembersWithUserData(boardId);
+        }
+
         #endregion
 
         //TODO: Should I move all this below to a CRUD? I believe I should, yes. 
         #region Private GET List of elements
 
+        /// <summary>
+        /// This will receive all the user information for user associated to a board.
+        /// It will first receive the list of board id => user id, then loop through
+        /// those user records and fetch the user data for each user id.
+        /// </summary>
+        /// <param name="boardId">The ID of the board to receive member for</param>
+        /// <returns>A List of BoardMember (email and username incl)</returns>
+        private IList<BoardMember> getMembersWithUserData(string boardId)
+        {
+            IList<BoardMember> members = getMembers(boardId);
+
+            string sql = "SELECT * FROM profiles WHERE ukey=@ukey";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                foreach (BoardMember member in members)
+                {
+                    query.Parameters.Clear();
+                    query.Parameters.AddWithValue("@ukey", member.userId);
+                    conn.Open();
+                    using (SqlDataReader result = query.ExecuteReader())
+                    {
+                        result.Read();
+                        member.email = result["email"].ToString();
+                        member.username = result["username"].ToString();
+                        conn.Close();
+                    }
+                }
+
+                return members;
+            }
+        }
+
+        /// <summary>
+        /// This will receive all members (user ids) of a board.
+        /// </summary>
+        /// <param name="boardId">The ID of the board to receive members for</param>
+        /// <returns>A List of BoardMember (board id, user id)</returns>
+        private IList<BoardMember> getMembers(string boardId)
+        {
+            IList<BoardMember> members = new List<BoardMember>();
+
+            string sql = "SELECT * FROM board_members WHERE board_id=@boardId";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                query.Parameters.AddWithValue("@boardId", boardId);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
+                {
+                    while (result.Read())
+                    {
+                        BoardMember member = new BoardMember();
+                        member.boardId = boardId;
+                        member.userId = result["user_id"].ToString();
+                    }
+
+                    conn.Close();
+                    return members;
+                }
+            }
+        }
 
         /// <summary>
         /// This will match a Profile against a user in the database.
@@ -276,7 +354,38 @@ namespace clk_rest
                         conn.Close();
                         return false;
                     }
+                    conn.Close();
+                    return true;
+                }
+            }
+        }
 
+        /// <summary>
+        /// This will check if a profile is a member of a board.
+        /// </summary>
+        /// <param name="profile">The profile to match</param>
+        /// <param name="boardId">The board ID to check against</param>
+        /// <returns>True/False if member or not</returns>
+        private bool isMember(Profile profile, string boardId)
+        {
+            if (profile.id == null)
+                return false;
+
+            string sql = "SELECT id FROM board_members WHERE user_id=@userId AND board_id=@boardId";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                query.Parameters.AddWithValue("@userId", profile.id);
+                query.Parameters.AddWithValue("@boardId", boardId);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
+                {
+                    if (!result.HasRows)
+                    {
+                        conn.Close();
+                        return false;
+                    }
+                    conn.Close();
                     return true;
                 }
             }
