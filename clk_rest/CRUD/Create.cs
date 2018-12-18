@@ -21,7 +21,7 @@ namespace clk_rest.CRUD
         /// Requires id, name, created and user id
         /// </summary>
         /// <param name="board">The board to create</param>
-        private void createBoard(Board board)
+        public void createBoard(Board board)
         {
             // Make sure we aren't getting empty values.
             if (board.id == null
@@ -52,7 +52,7 @@ namespace clk_rest.CRUD
         /// Requires id, name, created and board id for each item.
         /// </summary>
         /// <param name="lists">A List of List</param>
-        private void createLists(List<List> lists)
+        public void createLists(List<List> lists)
         {
             string sql = "INSERT INTO lists (ukey, name, created, board_id) VALUES (@ukey, @name, @created, @board_id)";
             using (SqlConnection conn = new SqlConnection(db))
@@ -85,7 +85,7 @@ namespace clk_rest.CRUD
         /// It requires id, name, created, list id for each item.
         /// </summary>
         /// <param name="cards">A List of Card</param>
-        private void createCards(List<Card> cards)
+        public void createCards(List<Card> cards)
         {
             string sql = "INSERT INTO cards (ukey, name, created, list_id, description) VALUES (@ukey, @name, @created, @list_id, @description)";
             using (SqlConnection conn = new SqlConnection(db))
@@ -120,7 +120,7 @@ namespace clk_rest.CRUD
         /// Requires id, name, created and card id for each item.
         /// </summary>
         /// <param name="checklists">A List of Checklist</param>
-        private void createChecklist(List<Checklist> checklists)
+        public void createChecklist(List<Checklist> checklists)
         {
             string sql = "INSERT INTO checklists (ukey, name, created, card_id) VALUES (@ukey, @name, @created, @card_id)";
             using (SqlConnection conn = new SqlConnection(db))
@@ -153,7 +153,7 @@ namespace clk_rest.CRUD
         /// It requires id, name, created and checklist id for each item.
         /// </summary>
         /// <param name="points"></param>
-        private void createChecklistPoints(List<ChecklistPoint> points)
+        public void createChecklistPoints(List<ChecklistPoint> points)
         {
             string sql = "INSERT INTO checklist_points (ukey, description, created, checklist_id, checked) VALUES (@ukey, @name, @created, @checklist_id, @checked)";
             using (SqlConnection conn = new SqlConnection(db))
@@ -191,7 +191,7 @@ namespace clk_rest.CRUD
         /// It requires id, comment, created, card id and user id for each item.
         /// </summary>
         /// <param name="comments">A List of Comment</param>
-        private void createComments(List<Comment> comments)
+        public void createComments(List<Comment> comments)
         {
             string sql = "INSERT INTO comments (ukey, comment, created, card_id, user_id) VALUES (@ukey, @comment, @created, @card_id, @user_id)";
             using (SqlConnection conn = new SqlConnection(db))
@@ -225,7 +225,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="profile">The profile to associate (requires id)</param>
         /// <param name="boardId">The board ID to associate the profile with</param>
-        private void createBoardMember(string userId, string boardId)
+        public void createBoardMember(string userId, string boardId)
         {
 
             string sql = "INSERT INTO board_members (board_id, user_id) VALUES (@boardId, @userId)";

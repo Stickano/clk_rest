@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using clk_rest.CRUD;
 using clk_rest.Models;
 using clk_rest.Resources;
 
@@ -15,7 +16,9 @@ namespace clk_rest
 {
     public class Service1 : IService1
     {
-        private string db = Server.db;
+        private static string db = Server.db;
+        Create create = new Create(db);
+        Read read = new Read(db);
 
         #region Profile management
 
@@ -32,12 +35,15 @@ namespace clk_rest
             if (!Validators.isMail(profile.email))
                 return -1;
 
+            if (profile.password == null)
+                return -1;
+
             // Unique ID and timestamp
             string uid = Guid.NewGuid().ToString();
             string created = Time.timestamp();
 
-            // TODO: Empty values? Check user doesn't already exist? Damn boii..
-
+            // TODO: Does user already exists?
+            
             // Create in database
             const string sql = "INSERT INTO profiles (email, password, ukey, created) VALUES (@email, @password, @ukey, @created)";
             using (SqlConnection conn = new SqlConnection(db))
@@ -114,22 +120,22 @@ namespace clk_rest
             profile.id = board.userId;
             profile.password = board.password;
 
-            if (!isUser(profile))
+            if (!read.isUser(profile))
                 return -1;
 
             // Make sure we aren't getting empty board values
             if (board.name.Equals("") || board.created.Equals("") || board.id.Equals(""))
                 return -1;
 
-            createBoard(board);
-            createLists(board.lists);
-            createCards(board.cards);
-            createChecklist(board.checklists);
-            createChecklistPoints(board.points);
-            createComments(board.comments);
+            create.createBoard(board);
+            create.createLists(board.lists);
+            create.createCards(board.cards);
+            create.createChecklist(board.checklists);
+            create.createChecklistPoints(board.points);
+            create.createComments(board.comments);
 
             // Add user to board connection in db
-            createBoardMember(profile.id, board.id);
+            create.createBoardMember(profile.id, board.id);
 
             return 1;
         }
@@ -147,6 +153,8 @@ namespace clk_rest
             Profile p = login(user);
             if (p.id == null)
                 return boards;
+
+            //TODO: You are not fetching members of boards table.. Idiot.!?
 
             string sql = "SELECT ukey, name FROM boards WHERE user_id=@uid";
             using (SqlConnection conn = new SqlConnection(db))
@@ -190,8 +198,8 @@ namespace clk_rest
             if (p.id == null)
                 return board;
 
-            board = getBoard(boardId);
-            IList<List> lists = getLists(boardId);
+            board = read.getBoard(boardId);
+            IList<List> lists = read.getLists(boardId);
             IList<Card> cards = new List<Card>();
             IList<Checklist> checks = new List<Checklist>();
             IList<ChecklistPoint> points = new List<ChecklistPoint>();
@@ -200,20 +208,20 @@ namespace clk_rest
             // Add cards
             foreach (List list in lists)
             {
-                ((List<Card>)cards).AddRange(getCards(list.id));
+                ((List<Card>)cards).AddRange(read.getCards(list.id));
             }
 
             // Add checklists & comments
             foreach (Card card in cards)
             {
-                ((List<Checklist>)checks).AddRange(getChecklists(card.id));
-                ((List<Comment>)comments).AddRange(getComments(card.id));
+                ((List<Checklist>)checks).AddRange(read.getChecklists(card.id));
+                ((List<Comment>)comments).AddRange(read.getComments(card.id));
             }
 
             // Add checklist points
             foreach (Checklist check in checks)
             {
-                ((List<ChecklistPoint>)points).AddRange(getPoints(check.id));
+                ((List<ChecklistPoint>)points).AddRange(read.getPoints(check.id));
             }
 
             return board;
@@ -230,7 +238,7 @@ namespace clk_rest
         /// <returns>1 on success, -1 on fail</returns>
         public int removeProfile(Profile profile)
         {
-            if (!isUser(profile))
+            if (!read.isUser(profile))
                 return -1;
 
             string sql = "DELETE FROM profiles WHERE ukey=@ukey";
@@ -257,14 +265,14 @@ namespace clk_rest
             IList<BoardMember> members = new List<BoardMember>();
 
             // Check user
-            if (!isUser(profile))
+            if (!read.isUser(profile))
                 return members;
 
             // Confirm user is a member of board
-            if (!isMember(profile, boardId))
+            if (!read.isMember(profile, boardId))
                 return members;
 
-            return getMembersWithUserData(boardId);
+            return read.getMembersWithUserData(boardId);
         }
 
         /// <summary>
@@ -278,14 +286,14 @@ namespace clk_rest
         /// <returns></returns>
         public int addMemberToBoard(Profile profile, string boardId, string userId)
         {
-            if (!isMember(profile, boardId))
+            if (!read.isMember(profile, boardId))
                 return -1;
 
             // TODO: Is the new user a match from the db?
             Profile p = new Profile();
             p.id = userId;
 
-            createBoardMember(userId, boardId);
+            create.createBoardMember(userId, boardId);
 
             return 1;
         }
@@ -300,12 +308,12 @@ namespace clk_rest
         public int createList(List list, string userId)
         {
             Profile p = new Profile{id = userId};
-            if (!isMember(p, list.boardId))
+            if (!read.isMember(p, list.boardId))
                 return -1;
 
             List<List> pack = new List<List>();
             pack.Add(list);
-            createLists(pack);
+            create.createLists(pack);
 
             return 1;
         }

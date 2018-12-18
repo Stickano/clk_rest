@@ -23,7 +23,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="boardId">The ID of the board to receive member for</param>
         /// <returns>A List of BoardMember (email and username incl)</returns>
-        private IList<BoardMember> getMembersWithUserData(string boardId)
+        public IList<BoardMember> getMembersWithUserData(string boardId)
         {
             IList<BoardMember> members = getMembers(boardId);
 
@@ -54,7 +54,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="boardId">The ID of the board to receive members for</param>
         /// <returns>A List of BoardMember (board id, user id)</returns>
-        private IList<BoardMember> getMembers(string boardId)
+        public IList<BoardMember> getMembers(string boardId)
         {
             IList<BoardMember> members = new List<BoardMember>();
 
@@ -88,7 +88,7 @@ namespace clk_rest.CRUD
         /// <param name="pointId">Find Board ID from CHecklist Point ID</param>
         /// <param name="commentId">Find Board ID from Comment ID</param>
         /// <returns>The Board ID</returns>
-        private string getBoardId(string cardId = "",
+        public string getBoardId(string cardId = "",
                                   string checkId = "",
                                   string pointId = "",
                                   string commentId = "")
@@ -140,7 +140,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="listId">The List ID to find a Board ID from</param>
         /// <returns>The Board ID for the List</returns>
-        private string getBoardId(string listId)
+        public string getBoardId(string listId)
         {
             string id = "";
 
@@ -170,7 +170,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="cardId">The Card ID to find a List ID from</param>
         /// <returns>The List ID for the Card</returns>
-        private string getListId(string cardId)
+        public string getListId(string cardId)
         {
             string id = "";
 
@@ -201,7 +201,7 @@ namespace clk_rest.CRUD
         /// <param name="checklistId">Incl. to find Card ID from a Checklist ID</param>
         /// <param name="commentId">Incl. to find a Card ID from a Comment ID</param>
         /// <returns>The Card ID of either the Checklist or the Comment</returns>
-        private string getCardId(string checklistId = "", string commentId = "")
+        public string getCardId(string checklistId = "", string commentId = "")
         {
             string id = "";
 
@@ -239,7 +239,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="pointId">The Checklist Point ID</param>
         /// <returns>The Checklist ID for the Checklist Point</returns>
-        private string getChecklistId(string pointId)
+        public string getChecklistId(string pointId)
         {
             string id = "";
 
@@ -270,7 +270,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="profile"></param>
         /// <returns></returns>
-        private bool isUser(Profile profile)
+        public bool isUser(Profile profile)
         {
             if (profile.id == null || profile.password == null)
                 return false;
@@ -303,7 +303,7 @@ namespace clk_rest.CRUD
         /// <param name="profile">The profile to match</param>
         /// <param name="boardId">The board ID to check against</param>
         /// <returns>True/False if member or not</returns>
-        private bool isMember(Profile profile, string boardId)
+        public bool isMember(Profile profile, string boardId)
         {
             if (profile.id == null)
                 return false;
@@ -333,7 +333,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="boardId">The ID of the board to receive</param>
         /// <returns>A Board object with all its content (lists, cards, checklists etc)</returns>
-        private Board getBoard(string boardId)
+        public Board getBoard(string boardId)
         {
             Board board = new Board();
 
@@ -365,7 +365,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="boardId">The ID of the board to receive lists for</param>
         /// <returns>A List of List</returns>
-        private IList<List> getLists(string boardId)
+        public IList<List> getLists(string boardId)
         {
             IList<List> lists = new List<List>();
 
@@ -398,7 +398,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="listId">The ID of the list to receive for</param>
         /// <returns>A List of Card</returns>
-        private IList<Card> getCards(string listId)
+        public IList<Card> getCards(string listId)
         {
             IList<Card> cards = new List<Card>();
 
@@ -431,7 +431,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="cardId">The ID of the card to receive for</param>
         /// <returns>A List of Checklist</returns>
-        private IList<Checklist> getChecklists(string cardId)
+        public IList<Checklist> getChecklists(string cardId)
         {
             IList<Checklist> checks = new List<Checklist>();
 
@@ -466,7 +466,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="checklistId">The ID of the checklist to receive for</param>
         /// <returns>A List of ChecklistPoint</returns>
-        private IList<ChecklistPoint> getPoints(string checklistId)
+        public IList<ChecklistPoint> getPoints(string checklistId)
         {
             IList<ChecklistPoint> points = new List<ChecklistPoint>();
 
@@ -502,7 +502,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="cardId">The ID of the card to receive for</param>
         /// <returns>A List of Comment</returns>
-        private IList<Comment> getComments(string cardId)
+        public IList<Comment> getComments(string cardId)
         {
             IList<Comment> comments = new List<Comment>();
 
