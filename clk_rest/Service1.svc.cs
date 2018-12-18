@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Security.Policy;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
@@ -19,6 +20,7 @@ namespace clk_rest
         private static string db = Server.db;
         Create create = new Create(db);
         Read read = new Read(db);
+        Update update = new Update(db);
 
         #region Profile management
 
@@ -101,6 +103,33 @@ namespace clk_rest
                     return p;
                 }
             }
+        }
+
+        /// <summary>
+        /// Deletes a profiles from the database.
+        /// It will first make sure, the id/password match
+        /// (make sure it is owner of profile, so not just everyone can delete profiles),
+        /// then delete it from the database.
+        /// It requires id and password of the profile.
+        /// </summary>
+        /// <param name="profile">The profile to delete</param>
+        /// <returns>1 on success, -1 on fail</returns>
+        public int removeProfile(Profile profile)
+        {
+            if (!read.isUser(profile))
+                return -1;
+
+            string sql = "DELETE FROM profiles WHERE ukey=@ukey";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                query.Parameters.AddWithValue("@ukey", profile.id);
+                conn.Open();
+                query.ExecuteNonQuery();
+                conn.Close();
+            }
+
+            return 1;
         }
 
         #endregion
@@ -225,33 +254,6 @@ namespace clk_rest
             }
 
             return board;
-        }
-
-        /// <summary>
-        /// Deletes a profiles from the database.
-        /// It will first make sure, the id/password match
-        /// (make sure it is owner of profile, so not just everyone can delete profiles),
-        /// then delete it from the database.
-        /// It requires id and password of the profile.
-        /// </summary>
-        /// <param name="profile">The profile to delete</param>
-        /// <returns>1 on success, -1 on fail</returns>
-        public int removeProfile(Profile profile)
-        {
-            if (!read.isUser(profile))
-                return -1;
-
-            string sql = "DELETE FROM profiles WHERE ukey=@ukey";
-            using (SqlConnection conn = new SqlConnection(db))
-            using (SqlCommand query = new SqlCommand(sql, conn))
-            {
-                query.Parameters.AddWithValue("@ukey", profile.id);
-                conn.Open();
-                query.ExecuteNonQuery();
-                conn.Close();
-            }
-
-            return 1;
         }
 
         /// <summary>
@@ -404,6 +406,91 @@ namespace clk_rest
             create.createComments(pack);
 
             return 1;
+        }
+
+        /// <summary>
+        /// Public method to update a list in the database
+        /// </summary>
+        /// <param name="list">The List to update</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns></returns>
+        public int updateList(List list, string userId)
+        {
+            string boardId = list.boardId;
+
+            Profile p = new Profile { id = userId };
+            if (!read.isMember(p, boardId))
+                return -1;
+
+            return update.updateList(list);
+        }
+
+        /// <summary>
+        /// Public method to update a card in the database.
+        /// </summary>
+        /// <param name="card">The card to update</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns></returns>
+        public int updateCard(Card card, string userId)
+        {
+            string boardId = read.getBoardId(card.id);
+
+            Profile p = new Profile { id = userId };
+            if (!read.isMember(p, boardId))
+                return -1;
+
+            return update.updateCard(card);
+        }
+
+        /// <summary>
+        /// Public method to update a checklist in the database
+        /// </summary>
+        /// <param name="checklist">The checklist to update</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns></returns>
+        public int updateChecklist(Checklist checklist, string userId)
+        {
+            string boardId = read.getBoardId(checklist.cardId);
+
+            Profile p = new Profile { id = userId };
+            if (!read.isMember(p, boardId))
+                return -1;
+
+            return update.updateChecklist(checklist);
+        }
+
+        /// <summary>
+        /// Public method to update a checklist point in the database
+        /// </summary>
+        /// <param name="point">The point to update</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns></returns>
+        public int updateChecklistPoint(ChecklistPoint point, string userId)
+        {
+            string boardId = read.getBoardId("", point.checklistId);
+
+            Profile p = new Profile { id = userId };
+            if (!read.isMember(p, boardId))
+                return -1;
+
+            return update.updateChecklistPoint(point);
+        }
+
+        /// <summary>
+        /// Public method to update a comment in the database
+        /// </summary>
+        /// <param name="comment">The comment to update</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns>The number of rows affected</returns>
+        public int updateComment(Comment comment, string userId)
+        {
+            string boardId = read.getBoardId(comment.cardId);
+
+            Profile p = new Profile { id = userId };
+            if (!read.isMember(p, boardId))
+                return -1;
+
+            return update.updateComment(comment);
         }
 
         #endregion

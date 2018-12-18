@@ -23,6 +23,9 @@ namespace clk_rest.CRUD
         /// <returns>The amount of rows affected</returns>
         public int updateList(List list)
         {
+            if (list.name == null || list.id == null)
+                return -1;
+
             int active = 1;
             if (!list.active)
                 active = 0;
@@ -49,9 +52,16 @@ namespace clk_rest.CRUD
         /// <returns>The amount of rows affected</returns>
         public int updateCard(Card card)
         {
+            if (card.name == null || card.listId == null || card.id == null)
+                return -1;
+
             int active = 1;
             if (!card.active)
                 active = 0;
+
+            string description = "";
+            if (card.description != null)
+                description = card.description;
 
             string sql = "UPDATE cards WHERE ukey=@ukey SET name=@name, list_id=@list_id, description=@description, active=" + active;
             using (SqlConnection conn = new SqlConnection(db))
@@ -60,7 +70,7 @@ namespace clk_rest.CRUD
                 query.Parameters.AddWithValue("@name", card.name);
                 query.Parameters.AddWithValue("@ukey", card.id);
                 query.Parameters.AddWithValue("@list_id", card.listId);
-                query.Parameters.AddWithValue("@description", card.description);
+                query.Parameters.AddWithValue("@description", description);
 
                 conn.Open();
                 int rowsAffected = query.ExecuteNonQuery();
@@ -77,6 +87,9 @@ namespace clk_rest.CRUD
         /// <returns>The amount of rows affected</returns>
         public int updateChecklist(Checklist checklist)
         {
+            if (checklist.name == null || checklist.id == null || checklist.cardId == null)
+                return -1;
+
             int active = 1;
             if (!checklist.active)
                 active = 0;
@@ -104,6 +117,9 @@ namespace clk_rest.CRUD
         /// <returns>The amount of rows affected</returns>
         public int updateChecklistPoint(ChecklistPoint point)
         {
+            if (point.name == null || point.id == null || point.checklistId == null)
+                return -1;
+
             int active = 1;
             if (!point.active)
                 active = 0;
@@ -136,6 +152,12 @@ namespace clk_rest.CRUD
         /// <returns>The amount of rows affected</returns>
         public int updateComment(Comment comment)
         {
+            if (comment.comment == null
+                || comment.cardId == null
+                || comment.id == null
+                || comment.userId == null)
+                return -1;
+
             int active = 1;
             if (!comment.active)
                 active = 0;
