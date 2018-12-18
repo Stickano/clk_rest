@@ -264,6 +264,29 @@ namespace clk_rest
             return getMembersWithUserData(boardId);
         }
 
+        /// <summary>
+        /// Public method to add a profile as a member of a board.
+        /// The profile parameter is the one submitting the new user to the board.
+        /// This profile has to be a member of the board himself.
+        /// </summary>
+        /// <param name="profile">The requesting profile (an already member of the board)</param>
+        /// <param name="boardId">The board to add the </param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public int addMemberToBoard(Profile profile, string boardId, string userId)
+        {
+            if (!isMember(profile, boardId))
+                return -1;
+
+            // TODO: Is the new user a match from the db?
+            Profile p = new Profile();
+            p.id = userId;
+
+            createBoardMember(userId, boardId);
+
+            return 1;
+        }
+
         #endregion
 
         //TODO: Should I move all this below to a CRUD? I believe I should, yes. 
@@ -612,9 +635,9 @@ namespace clk_rest
         private void createBoard(Board board)
         {
             // Make sure we aren't getting empty values.
-            if (board.id == null 
-                || board.name == null 
-                || board.created == null 
+            if (board.id == null
+                || board.name == null
+                || board.created == null
                 || board.userId == null)
                 return;
 
@@ -808,6 +831,26 @@ namespace clk_rest
             }
         }
 
+        /// <summary>
+        /// Create a member => board association in the database.
+        /// </summary>
+        /// <param name="profile">The profile to associate (requires id)</param>
+        /// <param name="boardId">The board ID to associate the profile with</param>
+        private void createBoardMember(string userId, string boardId)
+        {
+
+            string sql = "INSERT INTO board_members (board_id, user_id) VALUES (@boardId, @userId)";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                query.Parameters.AddWithValue("@boardId", boardId);
+                query.Parameters.AddWithValue("@userId", userId);
+
+                conn.Open();
+                query.ExecuteNonQuery();
+                conn.Close();
+            }
+        }
 
         #endregion
     }
