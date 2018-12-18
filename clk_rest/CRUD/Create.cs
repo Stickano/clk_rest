@@ -240,6 +240,5 @@ namespace clk_rest.CRUD
                 conn.Close();
             }
         }
-
     }
 }

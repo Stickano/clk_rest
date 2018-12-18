@@ -10,6 +10,7 @@ namespace clk_rest.Models
         public string id { get; set; } 
         public string name { get; set; }
         public string created { get; set; }
+        public bool active { get; set; } = true;
 
         public List<List> lists { get; set; }
         public List<Card> cards { get; set; }
@@ -25,6 +26,7 @@ namespace clk_rest.Models
             id = "";
             name = "";
             created = "";
+            active = true;
 
             lists = new List<List>();
             cards = new List<Card>();

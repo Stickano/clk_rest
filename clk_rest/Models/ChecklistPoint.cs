@@ -12,5 +12,6 @@ namespace clk_rest.Models
         public string checklistId { get; set; }
         public string created { get; set; }
         public bool isCheck { get; set; }
+        public bool active { get; set; } = true;
     }
 }

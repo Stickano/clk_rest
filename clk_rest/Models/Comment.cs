@@ -12,5 +12,6 @@ namespace clk_rest.Models
         public string cardId { get; set; }
         public string userId { get; set; }
         public string id { get; set; }
+        public bool active { get; set; } = true;
     }
 }

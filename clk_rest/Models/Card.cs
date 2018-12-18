@@ -12,5 +12,6 @@ namespace clk_rest.Models
         public string created { get; set; }
         public string listId { get; set; }
         public string description { get; set; }
+        public bool active { get; set; } = true;
     }
 }

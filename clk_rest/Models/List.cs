@@ -11,5 +11,6 @@ namespace clk_rest.Models
         public string name { get; set; }
         public string boardId { get; set; }
         public string created { get; set; }
+        public bool active { get; set; } = true;
     }
 }
