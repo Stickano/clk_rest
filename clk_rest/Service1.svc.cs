@@ -130,7 +130,7 @@ namespace clk_rest
             create.createBoard(board);
             create.createLists(board.lists);
             create.createCards(board.cards);
-            create.createChecklist(board.checklists);
+            create.createChecklists(board.checklists);
             create.createChecklistPoints(board.points);
             create.createComments(board.comments);
 
@@ -257,9 +257,9 @@ namespace clk_rest
         /// <summary>
         /// Public method to receive all members of a board (with user data).
         /// </summary>
-        /// <param name="profile"></param>
-        /// <param name="boardId"></param>
-        /// <returns></returns>
+        /// <param name="profile">The user that is making the request</param>
+        /// <param name="boardId">The ID of the board to fetch members for</param>
+        /// <returns>A list of BoardMember (user id and board id)</returns>
         public IList<BoardMember> getBoardMembers(Profile profile, string boardId)
         {
             IList<BoardMember> members = new List<BoardMember>();
@@ -282,8 +282,8 @@ namespace clk_rest
         /// </summary>
         /// <param name="profile">The requesting profile (an already member of the board)</param>
         /// <param name="boardId">The board to add the </param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <param name="userId">The ID of the user to add to the board</param>
+        /// <returns>1 on success, -1 on fail</returns>
         public int addMemberToBoard(Profile profile, string boardId, string userId)
         {
             if (!read.isMember(profile, boardId))
@@ -304,7 +304,7 @@ namespace clk_rest
         /// </summary>
         /// <param name="list">The List to create</param>
         /// <param name="userId">The ID of the user creating the new list.</param>
-        /// <returns></returns>
+        /// <returns>1 on success, -1 on fail</returns>
         public int createList(List list, string userId)
         {
             Profile p = new Profile{id = userId};
@@ -318,8 +318,90 @@ namespace clk_rest
             return 1;
         }
 
+        /// <summary>
+        /// Public method to create a new card in the database
+        /// It will make sure that the user is a member of the board.
+        /// </summary>
+        /// <param name="card">The card to create</param>
+        /// <param name="userId">The user ID who is creating the card</param>
+        /// <returns>1 on success, -1 on fail</returns>
         public int createCard(Card card, string userId)
         {
+            string boardId = read.getBoardId(card.id);
+
+            Profile p = new Profile { id = userId };
+            if (!read.isMember(p, boardId))
+                return -1;
+
+            List<Card> pack = new List<Card>();
+            pack.Add(card);
+            create.createCards(pack);
+
+            return 1;
+        }
+
+        /// <summary>
+        /// Public method to create a new checklist to the database.
+        /// User will be matched, that it is a member of the board.
+        /// </summary>
+        /// <param name="checklist">The checklist to create</param>
+        /// <param name="userId">The user ID who is creating the checklist</param>
+        /// <returns>1 on success, -1 on fail</returns>
+        public int createChecklist(Checklist checklist, string userId)
+        {
+            string boardId = read.getBoardId(checklist.cardId);
+
+            Profile p = new Profile { id = userId };
+            if (!read.isMember(p, boardId))
+                return -1;
+
+            List<Checklist> pack = new List<Checklist>();
+            pack.Add(checklist);
+            create.createChecklists(pack);
+
+            return 1;
+        }
+
+        /// <summary>
+        /// Public method to create a checklist point to the database.
+        /// It will confirm that user is a member of the board.
+        /// </summary>
+        /// <param name="point">The checklist point to create</param>
+        /// <param name="userId">The user ID who is creating the point</param>
+        /// <returns>1 on success, -1 on fail</returns>
+        public int createChecklistPoint(ChecklistPoint point, string userId)
+        {
+            string boardId = read.getBoardId("", point.checklistId);
+
+            Profile p = new Profile { id = userId };
+            if (!read.isMember(p, boardId))
+                return -1;
+
+            List<ChecklistPoint> pack = new List<ChecklistPoint>();
+            pack.Add(point);
+            create.createChecklistPoints(pack);
+
+            return 1;
+        }
+
+        /// <summary>
+        /// Public method to create a comment to a card in the database.
+        /// The user will be confirmed to be a member of the board.
+        /// </summary>
+        /// <param name="comment">The comment to create</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns></returns>
+        public int createComment(Comment comment, string userId)
+        {
+            string boardId = read.getBoardId(comment.cardId);
+
+            Profile p = new Profile { id = userId };
+            if (!read.isMember(p, boardId))
+                return -1;
+
+            List<Comment> pack = new List<Comment>();
+            pack.Add(comment);
+            create.createComments(pack);
 
             return 1;
         }

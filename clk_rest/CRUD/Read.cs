@@ -140,7 +140,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="listId">The List ID to find a Board ID from</param>
         /// <returns>The Board ID for the List</returns>
-        public string getBoardId(string listId)
+        private string getBoardId(string listId)
         {
             string id = "";
 
@@ -170,7 +170,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="cardId">The Card ID to find a List ID from</param>
         /// <returns>The List ID for the Card</returns>
-        public string getListId(string cardId)
+        private string getListId(string cardId)
         {
             string id = "";
 
@@ -201,7 +201,7 @@ namespace clk_rest.CRUD
         /// <param name="checklistId">Incl. to find Card ID from a Checklist ID</param>
         /// <param name="commentId">Incl. to find a Card ID from a Comment ID</param>
         /// <returns>The Card ID of either the Checklist or the Comment</returns>
-        public string getCardId(string checklistId = "", string commentId = "")
+        private string getCardId(string checklistId = "", string commentId = "")
         {
             string id = "";
 
@@ -239,7 +239,7 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="pointId">The Checklist Point ID</param>
         /// <returns>The Checklist ID for the Checklist Point</returns>
-        public string getChecklistId(string pointId)
+        private string getChecklistId(string pointId)
         {
             string id = "";
 

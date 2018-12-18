@@ -120,7 +120,7 @@ namespace clk_rest.CRUD
         /// Requires id, name, created and card id for each item.
         /// </summary>
         /// <param name="checklists">A List of Checklist</param>
-        public void createChecklist(List<Checklist> checklists)
+        public void createChecklists(List<Checklist> checklists)
         {
             string sql = "INSERT INTO checklists (ukey, name, created, card_id) VALUES (@ukey, @name, @created, @card_id)";
             using (SqlConnection conn = new SqlConnection(db))
