@@ -128,6 +128,9 @@ namespace clk_rest
             createChecklistPoints(board.points);
             createComments(board.comments);
 
+            // Add user to board connection in db
+            createBoardMember(profile.id, board.id);
+
             return 1;
         }
 
@@ -287,6 +290,32 @@ namespace clk_rest
             return 1;
         }
 
+        /// <summary>
+        /// Public method to create a new list to the database.
+        /// It will match that the user id is a member of the board.
+        /// </summary>
+        /// <param name="list">The List to create</param>
+        /// <param name="userId">The ID of the user creating the new list.</param>
+        /// <returns></returns>
+        public int createList(List list, string userId)
+        {
+            Profile p = new Profile{id = userId};
+            if (!isMember(p, list.boardId))
+                return -1;
+
+            List<List> pack = new List<List>();
+            pack.Add(list);
+            createLists(pack);
+
+            return 1;
+        }
+
+        public int createCard(Card card, string userId)
+        {
+
+            return 1;
+        }
+
         #endregion
 
         //TODO: Should I move all this below to a CRUD? I believe I should, yes. 
@@ -351,6 +380,191 @@ namespace clk_rest
 
                     conn.Close();
                     return members;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get a Board ID from any element (card, checklist, point or comment).
+        /// This is a parent method for the below couple of methods.
+        /// </summary>
+        /// <param name="cardId">Find Board ID from Card ID</param>
+        /// <param name="checkId">Find Board ID from Checklist ID</param>
+        /// <param name="pointId">Find Board ID from CHecklist Point ID</param>
+        /// <param name="commentId">Find Board ID from Comment ID</param>
+        /// <returns>The Board ID</returns>
+        private string getBoardId(string cardId = "", 
+                                  string checkId = "", 
+                                  string pointId = "", 
+                                  string commentId = "")
+        {
+
+            string boardId = "";
+
+            string lid = "";    // list id
+            string cid = "";    // card id
+            string chid = "";   // check id
+
+            // Find from card id 
+            if (!cardId.Equals(""))
+            {
+                lid = getListId(cardId);
+                boardId = getBoardId(lid);
+            }
+
+            // Find from checklist id
+            if (!checkId.Equals(""))
+            {
+                cid = getCardId(checkId);
+                lid = getListId(cid);
+                boardId = getBoardId(lid);
+            }
+
+            // Find from comment id
+            if (!commentId.Equals(""))
+            {
+                cid = getCardId("", commentId);
+                lid = getListId(cid);
+                boardId = getBoardId(lid);
+            }
+
+            // Find from checklist point id
+            if (!pointId.Equals(""))
+            {
+                chid = getChecklistId(pointId);
+                cid = getCardId(chid);
+                lid = getListId(cid);
+                boardId = getBoardId(lid);
+            }
+
+            return boardId;
+        }
+
+        /// <summary>
+        /// Get the Board ID from a List ID
+        /// </summary>
+        /// <param name="listId">The List ID to find a Board ID from</param>
+        /// <returns>The Board ID for the List</returns>
+        private string getBoardId(string listId)
+        {
+            string id = "";
+
+            string sql = "SELECT board_id FROM lists WHERE ukey=@listId";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                query.Parameters.AddWithValue("@listId", listId);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
+                {
+                    // If user was NOT found, return an empty token
+                    if (!result.HasRows)
+                        return id;
+
+                    result.Read();
+                    id = result["board_id"].ToString();
+
+                    conn.Close();
+                    return id;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the List ID from a Card ID
+        /// </summary>
+        /// <param name="cardId">The Card ID to find a List ID from</param>
+        /// <returns>The List ID for the Card</returns>
+        private string getListId(string cardId)
+        {
+            string id = "";
+
+            string sql = "SELECT list_id FROM cards WHERE ukey=@cardId";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                query.Parameters.AddWithValue("@cardId", cardId);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
+                {
+                    // If user was NOT found, return an empty token
+                    if (!result.HasRows)
+                        return id;
+
+                    result.Read();
+                    id = result["list_id"].ToString();
+
+                    conn.Close();
+                    return id;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the Card ID from either a Checklist ID, or a Comment ID.
+        /// </summary>
+        /// <param name="checklistId">Incl. to find Card ID from a Checklist ID</param>
+        /// <param name="commentId">Incl. to find a Card ID from a Comment ID</param>
+        /// <returns>The Card ID of either the Checklist or the Comment</returns>
+        private string getCardId(string checklistId="", string commentId="")
+        {
+            string id = "";
+
+            string table = "checklists";
+            string matchId = checklistId;
+            if (!commentId.Equals(""))
+            {
+                table = "comments";
+                matchId = commentId;
+            }
+
+            string sql = "SELECT card_id FROM "+ table +" WHERE ukey=@ukey";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                query.Parameters.AddWithValue("@ukey", matchId);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
+                {
+                    // If user was NOT found, return an empty token
+                    if (!result.HasRows)
+                        return id;
+
+                    result.Read();
+                    id = result["card_id"].ToString();
+
+                    conn.Close();
+                    return id;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the Checklist ID from a ChecklistPoint ID
+        /// </summary>
+        /// <param name="pointId">The Checklist Point ID</param>
+        /// <returns>The Checklist ID for the Checklist Point</returns>
+        private string getChecklistId(string pointId)
+        {
+            string id = "";
+
+            string sql = "SELECT checklist_id FROM checklist_points WHERE ukey=@pointId";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                query.Parameters.AddWithValue("@pointId", pointId);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
+                {
+                    // If user was NOT found, return an empty token
+                    if (!result.HasRows)
+                        return id;
+
+                    result.Read();
+                    id = result["checklist_id"].ToString();
+
+                    conn.Close();
+                    return id;
                 }
             }
         }
