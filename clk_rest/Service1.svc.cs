@@ -253,7 +253,12 @@ namespace clk_rest
         {
             IList<BoardMember> members = new List<BoardMember>();
 
+            // Check user
             if (!isUser(profile))
+                return members;
+
+            // Confirm user is a member of board
+            if (!isMember(profile, boardId))
                 return members;
 
             return getMembersWithUserData(boardId);
@@ -599,8 +604,20 @@ namespace clk_rest
 
         #region Private CREATE List of elements to the database
 
+        /// <summary>
+        /// Create a board to the database.
+        /// Requires id, name, created and user id
+        /// </summary>
+        /// <param name="board">The board to create</param>
         private void createBoard(Board board)
         {
+            // Make sure we aren't getting empty values.
+            if (board.id == null 
+                || board.name == null 
+                || board.created == null 
+                || board.userId == null)
+                return;
+
             string sql = "INSERT INTO boards (ukey, name, created, user_id) VALUES (@ukey, @name, @created, @user_id)";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
@@ -616,6 +633,13 @@ namespace clk_rest
             }
         }
 
+        /// <summary>
+        /// Create a list to the database.
+        /// THis will loop through all indexes of a List,
+        /// and create all the List to the database.
+        /// Requires id, name, created and board id for each item.
+        /// </summary>
+        /// <param name="lists">A List of List</param>
         private void createLists(List<List> lists)
         {
             string sql = "INSERT INTO lists (ukey, name, created, board_id) VALUES (@ukey, @name, @created, @board_id)";
@@ -624,6 +648,12 @@ namespace clk_rest
             {
                 foreach (List list in lists)
                 {
+                    if (list.id == null
+                        || list.name == null
+                        || list.created == null
+                        || list.boardId == null)
+                        continue;
+
                     query.Parameters.Clear();
                     query.Parameters.AddWithValue("@ukey", list.id);
                     query.Parameters.AddWithValue("@name", list.name);
@@ -637,6 +667,12 @@ namespace clk_rest
             }
         }
 
+        /// <summary>
+        /// Creates a (or several) cards into the database.
+        /// It takes a List of Card and create all the cards.
+        /// It requires id, name, created, list id for each item.
+        /// </summary>
+        /// <param name="cards">A List of Card</param>
         private void createCards(List<Card> cards)
         {
             string sql = "INSERT INTO cards (ukey, name, created, list_id, description) VALUES (@ukey, @name, @created, @list_id, @description)";
@@ -645,6 +681,12 @@ namespace clk_rest
             {
                 foreach (Card card in cards)
                 {
+                    if (card.id == null
+                        || card.name == null
+                        || card.created == null
+                        || card.listId == null)
+                        continue;
+
                     query.Parameters.Clear();
                     query.Parameters.AddWithValue("@ukey", card.id);
                     query.Parameters.AddWithValue("@name", card.name);
@@ -660,6 +702,12 @@ namespace clk_rest
 
         }
 
+        /// <summary>
+        /// Create checklists to the database.
+        /// Takes a List of Checklist and will create all items.
+        /// Requires id, name, created and card id for each item.
+        /// </summary>
+        /// <param name="checklists">A List of Checklist</param>
         private void createChecklist(List<Checklist> checklists)
         {
             string sql = "INSERT INTO checklists (ukey, name, created, card_id) VALUES (@ukey, @name, @created, @card_id)";
@@ -668,6 +716,12 @@ namespace clk_rest
             {
                 foreach (Checklist ck in checklists)
                 {
+                    if (ck.id == null
+                        || ck.name == null
+                        || ck.created == null
+                        || ck.cardId == null)
+                        continue;
+
                     query.Parameters.Clear();
                     query.Parameters.AddWithValue("@ukey", ck.id);
                     query.Parameters.AddWithValue("@name", ck.name);
@@ -681,6 +735,12 @@ namespace clk_rest
             }
         }
 
+        /// <summary>
+        /// This will create checklist points into the database.
+        /// It will take a List of ChecklistPoint and create all the items.
+        /// It requires id, name, created and checklist id for each item.
+        /// </summary>
+        /// <param name="points"></param>
         private void createChecklistPoints(List<ChecklistPoint> points)
         {
             string sql = "INSERT INTO checklist_points (ukey, description, created, checklist_id, checked) VALUES (@ukey, @name, @created, @checklist_id, @checked)";
@@ -689,6 +749,12 @@ namespace clk_rest
             {
                 foreach (ChecklistPoint point in points)
                 {
+                    if (point.id == null
+                        || point.name == null
+                        || point.created == null
+                        || point.checklistId == null)
+                        continue;
+
                     int isCheck = 0;
                     if (point.isCheck)
                         isCheck = 1;
@@ -707,6 +773,12 @@ namespace clk_rest
             }
         }
 
+        /// <summary>
+        /// Create comments to the database.
+        /// This will take a List of Comment and create each item.
+        /// It requires id, comment, created, card id and user id for each item.
+        /// </summary>
+        /// <param name="comments">A List of Comment</param>
         private void createComments(List<Comment> comments)
         {
             string sql = "INSERT INTO comments (ukey, comment, created, card_id, user_id) VALUES (@ukey, @comment, @created, @card_id, @user_id)";
@@ -715,6 +787,13 @@ namespace clk_rest
             {
                 foreach (Comment comment in comments)
                 {
+                    if (comment.id == null
+                        || comment.comment == null
+                        || comment.created == null
+                        || comment.cardId == null
+                        || comment.userId == null)
+                        continue;
+
                     query.Parameters.Clear();
                     query.Parameters.AddWithValue("@ukey", comment.id);
                     query.Parameters.AddWithValue("@comment", comment.comment);
