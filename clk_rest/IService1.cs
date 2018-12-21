@@ -78,7 +78,12 @@ namespace clk_rest
         [OperationContract]
         Board getBoard(Profile user, string boardId);
 
-
+        /// <summary>
+        /// Get all the members of a board.
+        /// </summary>
+        /// <param name="user">The user making he request</param>
+        /// <param name="boardId">The ID of the board to get members from</param>
+        /// <returns>A List of BoardMember (boardId and userId)</returns>
         [WebInvoke(UriTemplate = "board/getmembers/{boardId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
@@ -87,6 +92,13 @@ namespace clk_rest
         [OperationContract]
         IList<BoardMember> getBoardMembers(Profile user, string boardId);
 
+        /// <summary>
+        /// Add a member to a board.
+        /// </summary>
+        /// <param name="user">The user making the request.</param>
+        /// <param name="boardId">The ID of the board to associate a member</param>
+        /// <param name="userId">The ID of the user to associate</param>
+        /// <returns>1 if success</returns>
         [WebInvoke(UriTemplate = "board/addmember/{boardId}/{userId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
@@ -95,6 +107,12 @@ namespace clk_rest
         [OperationContract]
         int addMemberToBoard(Profile user, string boardId, string userId);
 
+        /// <summary>
+        /// Create a new list.
+        /// </summary>
+        /// <param name="list">The List object to create</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns>1 if success</returns>
         [WebInvoke(UriTemplate = "board/createlist/{userId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
@@ -103,6 +121,12 @@ namespace clk_rest
         [OperationContract]
         int createList(List list, string userId);
 
+        /// <summary>
+        /// Create a new card
+        /// </summary>
+        /// <param name="card">The card object to create</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns>1 on success</returns>
         [WebInvoke(UriTemplate = "board/createcard/{userId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
@@ -111,6 +135,12 @@ namespace clk_rest
         [OperationContract]
         int createCard(Card card, string userId);
 
+        /// <summary>
+        /// Create a new checklist
+        /// </summary>
+        /// <param name="checklist">The checklist to create</param>
+        /// <param name="userId">The ID of the user making the request.</param>
+        /// <returns>1 on success</returns>
         [WebInvoke(UriTemplate = "board/createchecklist/{userId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
@@ -119,6 +149,12 @@ namespace clk_rest
         [OperationContract]
         int createChecklist(Checklist checklist, string userId);
 
+        /// <summary>
+        /// Create a new checklist point
+        /// </summary>
+        /// <param name="point">The point to create</param>
+        /// <param name="userId">THe ID of the user making the request</param>
+        /// <returns>1 on success</returns>
         [WebInvoke(UriTemplate = "board/createpoint/{userId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
@@ -127,6 +163,12 @@ namespace clk_rest
         [OperationContract]
         int createChecklistPoint(ChecklistPoint point, string userId);
 
+        /// <summary>
+        /// Create a new comment
+        /// </summary>
+        /// <param name="comment">The comment object to create</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns>1 on success</returns>
         [WebInvoke(UriTemplate = "board/createcomment/{userId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
@@ -135,6 +177,12 @@ namespace clk_rest
         [OperationContract]
         int createComment(Comment comment, string userId);
 
+        /// <summary>
+        /// Update an already existing list
+        /// </summary>
+        /// <param name="list">The list to update</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns>1 on success</returns>
         [WebInvoke(UriTemplate = "board/updatelist/{userId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
@@ -143,6 +191,12 @@ namespace clk_rest
         [OperationContract]
         int updateList(List list, string userId);
 
+        /// <summary>
+        /// Update an already existing card
+        /// </summary>
+        /// <param name="card">The card to update</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns>1 on success</returns>
         [WebInvoke(UriTemplate = "board/updatecard/{userId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
@@ -151,6 +205,12 @@ namespace clk_rest
         [OperationContract]
         int updateCard(Card card, string userId);
 
+        /// <summary>
+        /// Update an already existing checklist
+        /// </summary>
+        /// <param name="checklist">The checklist object to update</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns></returns>
         [WebInvoke(UriTemplate = "board/updatechecklist/{userId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
@@ -159,6 +219,12 @@ namespace clk_rest
         [OperationContract]
         int updateChecklist(Checklist checklist, string userId);
 
+        /// <summary>
+        /// Update an already existing checklist point
+        /// </summary>
+        /// <param name="point">The point object to update</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns></returns>
         [WebInvoke(UriTemplate = "board/updatepoint/{userId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
@@ -167,6 +233,12 @@ namespace clk_rest
         [OperationContract]
         int updateChecklistPoint(ChecklistPoint point, string userId);
 
+        /// <summary>
+        /// Update an already exisiting comment
+        /// </summary>
+        /// <param name="comment">The comment object to update</param>
+        /// <param name="userId">The ID of the user making the request</param>
+        /// <returns></returns>
         [WebInvoke(UriTemplate = "board/updatecomment/{userId}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
