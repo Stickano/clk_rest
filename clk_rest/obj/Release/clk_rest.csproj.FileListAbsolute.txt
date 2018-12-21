@@ -1,0 +1,7 @@
+C:\Users\This is not my name\source\repos\clk_rest\clk_rest\bin\clk_rest.dll.config
+C:\Users\This is not my name\source\repos\clk_rest\clk_rest\bin\clk_rest.dll
+C:\Users\This is not my name\source\repos\clk_rest\clk_rest\bin\clk_rest.pdb
+C:\Users\This is not my name\source\repos\clk_rest\clk_rest\obj\Release\clk_rest.csprojResolveAssemblyReference.cache
+C:\Users\This is not my name\source\repos\clk_rest\clk_rest\obj\Release\clk_rest.csproj.CoreCompileInputs.cache
+C:\Users\This is not my name\source\repos\clk_rest\clk_rest\obj\Release\clk_rest.dll
+C:\Users\This is not my name\source\repos\clk_rest\clk_rest\obj\Release\clk_rest.pdb

@@ -65,7 +65,11 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CRUD\Create.cs" />
+    <Compile Include="CRUD\Read.cs" />
+    <Compile Include="CRUD\Update.cs" />
     <Compile Include="Models\Board.cs" />
+    <Compile Include="Models\BoardMember.cs" />
     <Compile Include="Models\Card.cs" />
     <Compile Include="Models\Checklist.cs" />
     <Compile Include="Models\ChecklistPoint.cs" />
