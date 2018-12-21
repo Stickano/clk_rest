@@ -79,6 +79,102 @@ namespace clk_rest
         Board getBoard(Profile user, string boardId);
 
 
+        [WebInvoke(UriTemplate = "board/getmembers/{boardId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        IList<BoardMember> getBoardMembers(Profile user, string boardId);
+
+        [WebInvoke(UriTemplate = "board/addmember/{boardId}/{userId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int addMemberToBoard(Profile user, string boardId, string userId);
+
+        [WebInvoke(UriTemplate = "board/createlist/{userId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int createList(List list, string userId);
+
+        [WebInvoke(UriTemplate = "board/createcard/{userId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int createCard(Card card, string userId);
+
+        [WebInvoke(UriTemplate = "board/createchecklist/{userId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int createChecklist(Checklist checklist, string userId);
+
+        [WebInvoke(UriTemplate = "board/createpoint/{userId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int createChecklistPoint(ChecklistPoint point, string userId);
+
+        [WebInvoke(UriTemplate = "board/createcomment/{userId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int createComment(Comment comment, string userId);
+
+        [WebInvoke(UriTemplate = "board/updatelist/{userId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int updateList(List list, string userId);
+
+        [WebInvoke(UriTemplate = "board/updatecard/{userId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int updateCard(Card card, string userId);
+
+        [WebInvoke(UriTemplate = "board/updatechecklist/{userId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int updateChecklist(Checklist checklist, string userId);
+
+        [WebInvoke(UriTemplate = "board/updatepoint/{userId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int updateChecklistPoint(ChecklistPoint point, string userId);
+
+        [WebInvoke(UriTemplate = "board/updatecomment/{userId}",
+            Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Bare)]
+        [OperationContract]
+        int updateComment(Comment comment, string userId);
+
         //[WebInvoke(UriTemplate = "board/getall",
         //    Method = "GET",
         //    ResponseFormat = WebMessageFormat.Json)]
