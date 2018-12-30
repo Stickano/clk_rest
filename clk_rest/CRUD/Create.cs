@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using clk_rest.Models;
+using clk_rest.Resources;
 
 namespace clk_rest.CRUD
 {
@@ -228,12 +229,13 @@ namespace clk_rest.CRUD
         public void createBoardMember(string userId, string boardId)
         {
 
-            string sql = "INSERT INTO board_members (board_id, user_id) VALUES (@boardId, @userId)";
+            string sql = "INSERT INTO board_members (board_id, user_id, created) VALUES (@boardId, @userId, @created)";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
                 query.Parameters.AddWithValue("@boardId", boardId);
                 query.Parameters.AddWithValue("@userId", userId);
+                query.Parameters.AddWithValue("@created", Time.timestamp());
 
                 conn.Open();
                 query.ExecuteNonQuery();
