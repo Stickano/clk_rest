@@ -99,7 +99,7 @@ namespace clk_rest
         /// <param name="boardId">The ID of the board to associate a member</param>
         /// <param name="userId">The ID of the user to associate</param>
         /// <returns>1 if success</returns>
-        [WebInvoke(UriTemplate = "board/addmember/{boardId}/{userId}",
+        [WebInvoke(UriTemplate = "board/addmember/{boardId}/{email}",
             Method = "POST",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,

@@ -308,7 +308,7 @@ namespace clk_rest.CRUD
             if (!Validators.isMail(email))
                 return "";
 
-            string sql = "SELECT id FROM profiles WHERE email=@mail";
+            string sql = "SELECT ukey FROM profiles WHERE email=@mail";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
