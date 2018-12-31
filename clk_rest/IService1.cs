@@ -105,7 +105,7 @@ namespace clk_rest
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Bare)]
         [OperationContract]
-        int addMemberToBoard(Profile user, string boardId, string userId);
+        int addMemberToBoard(Profile user, string boardId, string email);
 
         /// <summary>
         /// Create a new list.

@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using clk_rest.Models;
+using clk_rest.Resources;
 
 namespace clk_rest.CRUD
 {
@@ -293,6 +294,40 @@ namespace clk_rest.CRUD
                     }
                     conn.Close();
                     return true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// This is used to check if a email is registered as a profile.
+        /// </summary>
+        /// <param name="email">The email to match in the db</param>
+        /// <returns>True/False if registered or not</returns>
+        public string isProfile(string email)
+        {
+            if (!Validators.isMail(email))
+                return "";
+
+            string sql = "SELECT id FROM profiles WHERE email=@mail";
+            using (SqlConnection conn = new SqlConnection(db))
+            using (SqlCommand query = new SqlCommand(sql, conn))
+            {
+                query.Parameters.AddWithValue("@mail", email);
+                conn.Open();
+                using (SqlDataReader result = query.ExecuteReader())
+                {
+                    // If user was NOT found, return an empty token
+                    if (!result.HasRows)
+                    {
+                        conn.Close();
+                        return "";
+                    }
+
+                    result.Read();
+                    string id = result["ukey"].ToString();
+
+                    conn.Close();
+                    return id;
                 }
             }
         }

@@ -286,17 +286,16 @@ namespace clk_rest
         /// <param name="boardId">The board to add the </param>
         /// <param name="userId">The ID of the user to add to the board</param>
         /// <returns>1 on success, -1 on fail</returns>
-        public int addMemberToBoard(Profile profile, string boardId, string userId)
+        public int addMemberToBoard(Profile profile, string boardId, string email)
         {
             if (!read.isMember(profile, boardId))
                 return -1;
 
-            // TODO: Is the new user a match from the db?
-            Profile p = new Profile();
-            p.id = userId;
+            string userId = read.isProfile(email);
+            if (userId.Equals(""))
+                return -1;
 
             create.createBoardMember(userId, boardId);
-
             return 1;
         }
 
