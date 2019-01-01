@@ -24,15 +24,16 @@ namespace clk_rest.CRUD
         /// </summary>
         /// <param name="boardId">The ID of the board to receive member for</param>
         /// <returns>A List of BoardMember (email and username incl)</returns>
-        public IList<BoardMember> getMembersWithUserData(string boardId)
+        public IList<Profile> getMembersWithUserData(string boardId)
         {
             IList<BoardMember> members = getMembers(boardId);
+            IList<Profile> profiles = new List<Profile>();
 
             string sql = "SELECT * FROM profiles WHERE ukey=@ukey";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
-                foreach (BoardMember member in members)
+                foreach (BoardMember member in members.ToList())
                 {
                     query.Parameters.Clear();
                     query.Parameters.AddWithValue("@ukey", member.userId);
@@ -40,13 +41,19 @@ namespace clk_rest.CRUD
                     using (SqlDataReader result = query.ExecuteReader())
                     {
                         result.Read();
-                        member.email = result["email"].ToString();
-                        member.username = result["username"].ToString();
+
+                        Profile p = new Profile();
+                        p.email = result["email"].ToString();
+                        p.username = result["username"].ToString();
+                        p.id = result["ukey"].ToString();
+                        
+                        profiles.Add(p);
+
                         conn.Close();
                     }
                 }
 
-                return members;
+                return profiles;
             }
         }
 
@@ -72,6 +79,7 @@ namespace clk_rest.CRUD
                         BoardMember member = new BoardMember();
                         member.boardId = boardId;
                         member.userId = result["user_id"].ToString();
+                        members.Add(member);
                     }
 
                     conn.Close();

@@ -90,7 +90,7 @@ namespace clk_rest
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Bare)]
         [OperationContract]
-        IList<BoardMember> getBoardMembers(Profile user, string boardId);
+        IList<Profile> getBoardMembers(Profile user, string boardId);
 
         /// <summary>
         /// Add a member to a board.

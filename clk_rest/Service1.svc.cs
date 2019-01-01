@@ -262,9 +262,9 @@ namespace clk_rest
         /// <param name="profile">The user that is making the request</param>
         /// <param name="boardId">The ID of the board to fetch members for</param>
         /// <returns>A list of BoardMember (user id and board id)</returns>
-        public IList<BoardMember> getBoardMembers(Profile profile, string boardId)
+        public IList<Profile> getBoardMembers(Profile profile, string boardId)
         {
-            IList<BoardMember> members = new List<BoardMember>();
+            IList<Profile> members = new List<Profile>();
 
             // Check user
             if (!read.isUser(profile))
