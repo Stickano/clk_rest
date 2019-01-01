@@ -26,7 +26,9 @@ namespace clk_rest.CRUD
         /// <returns>A List of BoardMember (email and username incl)</returns>
         public IList<Profile> getMembersWithUserData(string boardId)
         {
-            IList<BoardMember> members = getMembers(boardId);
+            IList<BoardMember> members = new List<BoardMember>();
+            members = getMembers(boardId);
+            
             IList<Profile> profiles = new List<Profile>();
 
             string sql = "SELECT * FROM profiles WHERE ukey=@ukey";
