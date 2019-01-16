@@ -460,8 +460,9 @@ namespace clk_rest.CRUD
                         Card card = new Card();
                         card.listId = result["list_id"].ToString();
                         card.id = result["ukey"].ToString();
-                        card.name = result["description"].ToString();
+                        card.name = result["name"].ToString();
                         card.created = result["created"].ToString();
+                        card.description = result["description"].ToString();
                         cards.Add(card);
                     }
 
