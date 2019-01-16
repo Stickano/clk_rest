@@ -253,6 +253,12 @@ namespace clk_rest
                 ((List<ChecklistPoint>)points).AddRange(read.getPoints(check.id));
             }
 
+            board.lists = (List<List>) lists;
+            board.cards = (List<Card>) cards;
+            board.checklists = (List<Checklist>) checks;
+            board.points = (List<ChecklistPoint>) points;
+            board.comments = (List<Comment>) comments;
+
             return board;
         }
 
