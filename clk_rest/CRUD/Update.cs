@@ -30,7 +30,7 @@ namespace clk_rest.CRUD
             if (!list.active)
                 active = 0;
 
-            string sql = "UPDATE lists WHERE ukey=@ukey SET name=@name, active=" + active;
+            string sql = "UPDATE lists SET name=@name, active=" + active + " WHERE ukey=@ukey";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
@@ -63,7 +63,7 @@ namespace clk_rest.CRUD
             if (card.description != null)
                 description = card.description;
 
-            string sql = "UPDATE cards WHERE ukey=@ukey SET name=@name, list_id=@list_id, description=@description, active=" + active;
+            string sql = "UPDATE cards SET name=@name, list_id=@list_id, description=@description, active=" + active + " WHERE ukey=@ukey";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
@@ -94,7 +94,7 @@ namespace clk_rest.CRUD
             if (!checklist.active)
                 active = 0;
 
-            string sql = "UPDATE checklists WHERE ukey=@ukey SET name=@name, card_id=@card_id, active=" + active;
+            string sql = "UPDATE checklists SET name=@name, card_id=@card_id, active=" + active + " WHERE ukey=@ukey";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
@@ -129,7 +129,7 @@ namespace clk_rest.CRUD
                 isCheck = 1;
             
 
-            string sql = "UPDATE checklist_points WHERE ukey=@ukey SET description=@description, checklist_id=@checklist_id, checked="+ isCheck +", active=" + active;
+            string sql = "UPDATE checklist_points SET description=@description, checklist_id=@checklist_id, checked="+ isCheck +", active=" + active + " WHERE ukey=@ukey";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
@@ -162,7 +162,7 @@ namespace clk_rest.CRUD
             if (!comment.active)
                 active = 0;
 
-            string sql = "UPDATE comments WHERE ukey=@ukey SET comment=@comment, card_id=@card_id, active=" + active;
+            string sql = "UPDATE comments SET comment=@comment, card_id=@card_id, active=" + active + " WHERE ukey=@ukey";
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {

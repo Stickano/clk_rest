@@ -11,10 +11,14 @@ namespace clk_rest.CRUD
     public class Create
     {
         private string db;
+        private Read read;
+        private Update update;
 
         public Create(string db)
         {
             this.db = db;
+            read = new Read(db);
+            update = new Update(db);
         }
 
         /// <summary>
@@ -32,6 +36,9 @@ namespace clk_rest.CRUD
                 return;
 
             string sql = "INSERT INTO boards (ukey, name, created, user_id) VALUES (@ukey, @name, @created, @user_id)";
+            if (read.getBoard(board.id).id != null)
+                sql = "UPDATE boards SET name=@name WHERE ukey=@ukey";
+
             using (SqlConnection conn = new SqlConnection(db))
             using (SqlCommand query = new SqlCommand(sql, conn))
             {
@@ -67,6 +74,14 @@ namespace clk_rest.CRUD
                         || list.boardId == null)
                         continue;
 
+                    // Update if already exists
+                    List<List> checkAgainstLists = read.getLists(list.boardId).ToList();
+                    if (checkAgainstLists.Any(x => x.id == list.id))
+                    {
+                        update.updateList(list);
+                        continue;
+                    }
+
                     query.Parameters.Clear();
                     query.Parameters.AddWithValue("@ukey", list.id);
                     query.Parameters.AddWithValue("@name", list.name);
@@ -99,6 +114,14 @@ namespace clk_rest.CRUD
                         || card.created == null
                         || card.listId == null)
                         continue;
+
+                    // Update if already exists
+                    List<Card> checkAgainstCards = read.getCards(card.listId).ToList();
+                    if (checkAgainstCards.Any(x => x.id == card.id))
+                    {
+                        update.updateCard(card);
+                        continue;
+                    }
 
                     query.Parameters.Clear();
                     query.Parameters.AddWithValue("@ukey", card.id);
@@ -135,6 +158,14 @@ namespace clk_rest.CRUD
                         || ck.cardId == null)
                         continue;
 
+                    // Update if already exists
+                    List<Checklist> checkAgainstChecks = read.getChecklists(ck.cardId).ToList();
+                    if (checkAgainstChecks.Any(x => x.id == ck.id))
+                    {
+                        update.updateChecklist(ck);
+                        continue;
+                    }
+
                     query.Parameters.Clear();
                     query.Parameters.AddWithValue("@ukey", ck.id);
                     query.Parameters.AddWithValue("@name", ck.name);
@@ -167,6 +198,15 @@ namespace clk_rest.CRUD
                         || point.created == null
                         || point.checklistId == null)
                         continue;
+
+                    // Update if already exists
+                    List<ChecklistPoint> checkAgainstPoints = read.getPoints(point.checklistId).ToList();
+                    if (checkAgainstPoints.Any(x => x.id == point.id))
+                    {
+                        update.updateChecklistPoint(point);
+                        continue;
+                    }
+
 
                     int isCheck = 0;
                     if (point.isCheck)
@@ -206,6 +246,14 @@ namespace clk_rest.CRUD
                         || comment.cardId == null
                         || comment.userId == null)
                         continue;
+
+                    // Update if already exists
+                    List<Comment> checkAgainstComments = read.getComments(comment.cardId).ToList();
+                    if (checkAgainstComments.Any(x => x.id == comment.id))
+                    {
+                        update.updateComment(comment);
+                        continue;
+                    }
 
                     query.Parameters.Clear();
                     query.Parameters.AddWithValue("@ukey", comment.id);

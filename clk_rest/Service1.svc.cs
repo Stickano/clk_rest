@@ -228,11 +228,11 @@ namespace clk_rest
                 return board;
 
             board = read.getBoard(boardId);
-            IList<List> lists = read.getLists(boardId);
-            IList<Card> cards = new List<Card>();
-            IList<Checklist> checks = new List<Checklist>();
-            IList<ChecklistPoint> points = new List<ChecklistPoint>();
-            IList<Comment> comments = new List<Comment>();
+            List<List> lists = read.getLists(boardId).ToList();
+            List<Card> cards = new List<Card>();
+            List<Checklist> checks = new List<Checklist>();
+            List<ChecklistPoint> points = new List<ChecklistPoint>();
+            List<Comment> comments = new List<Comment>();
 
             // Add cards
             foreach (List list in lists)
@@ -253,11 +253,11 @@ namespace clk_rest
                 ((List<ChecklistPoint>)points).AddRange(read.getPoints(check.id));
             }
 
-            board.lists = (List<List>) lists;
-            board.cards = (List<Card>) cards;
-            board.checklists = (List<Checklist>) checks;
-            board.points = (List<ChecklistPoint>) points;
-            board.comments = (List<Comment>) comments;
+            board.lists = (List<List>) lists.Distinct().ToList();
+            board.cards = (List<Card>) cards.Distinct().ToList();
+            board.checklists = (List<Checklist>) checks.Distinct().ToList();
+            board.points = (List<ChecklistPoint>) points.Distinct().ToList();
+            board.comments = (List<Comment>) comments.Distinct().ToList();
 
             return board;
         }
