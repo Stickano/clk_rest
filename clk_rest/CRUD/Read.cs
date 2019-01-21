@@ -380,7 +380,7 @@ namespace clk_rest.CRUD
         /// <returns>A Board object with all its content (lists, cards, checklists etc)</returns>
         public Board getBoard(string boardId)
         {
-            Board board = new Board();
+            Board board = new Board() {id = null};
 
             string sql = "SELECT * FROM boards WHERE ukey=@boardId AND active=1";
             using (SqlConnection conn = new SqlConnection(db))

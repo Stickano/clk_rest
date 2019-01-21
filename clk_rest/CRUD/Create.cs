@@ -29,7 +29,7 @@ namespace clk_rest.CRUD
         public void createBoard(Board board)
         {
             // Make sure we aren't getting empty values.
-            if (board.id == null
+            if (   board.id == null
                 || board.name == null
                 || board.created == null
                 || board.userId == null)
