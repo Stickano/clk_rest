@@ -123,12 +123,16 @@ namespace clk_rest.CRUD
                         continue;
                     }
 
+                    string description = "";
+                    if (card.description != null)
+                        description = card.description;
+
                     query.Parameters.Clear();
                     query.Parameters.AddWithValue("@ukey", card.id);
                     query.Parameters.AddWithValue("@name", card.name);
                     query.Parameters.AddWithValue("@created", card.created);
                     query.Parameters.AddWithValue("@list_id", card.listId);
-                    query.Parameters.AddWithValue("@description", card.description);
+                    query.Parameters.AddWithValue("@description", description);
 
                     conn.Open();
                     query.ExecuteNonQuery();
