@@ -407,6 +407,7 @@ namespace clk_rest
                 return -1;
 
             List<Comment> pack = new List<Comment>();
+            comment.userId = userId;
             pack.Add(comment);
             create.createComments(pack);
 
