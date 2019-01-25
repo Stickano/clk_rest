@@ -42,6 +42,9 @@ namespace clk_rest.CRUD
                     conn.Open();
                     using (SqlDataReader result = query.ExecuteReader())
                     {
+                        if (!result.HasRows)
+                            continue;
+
                         result.Read();
 
                         Profile p = new Profile();
@@ -50,9 +53,8 @@ namespace clk_rest.CRUD
                         p.id = result["ukey"].ToString();
                         
                         profiles.Add(p);
-
-                        conn.Close();
                     }
+                    conn.Close();
                 }
 
                 return profiles;

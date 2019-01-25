@@ -11,5 +11,6 @@ namespace clk_rest.Models
         public string userId { get; set; }
         public string email { get; set; }
         public string username { get; set; }
+        public string memberSince { get; set; }
     }
 }
